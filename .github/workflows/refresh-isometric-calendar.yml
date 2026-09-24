@@ -1,0 +1,31 @@
+name: Refresh isometric contribution calendar
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate calendar
+        uses: yoshi389111/github-profile-3d-contrib@9e3f937195cf840d364388973f73e3c4b3753586
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: ${{ github.repository_owner }}
+          SETTING_JSON: assets/isometric-calendar-settings.json
+
+      - name: Commit updated calendar
+        run: |
+          git add profile-3d-contrib/profile-isometric.svg
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Refresh isometric contribution calendar"
+          git push
